@@ -1681,18 +1681,22 @@ html:n=>D('paper pr',P(22,12,316,556,-.3,2),`
   <ol class="pr-l">${PROM.map((t,i)=>`<li class="wh" style="--dl:${(.2+i*.4).toFixed(2)}s"><span>${t}</span></li>`).join('')}</ol>
   <div class="pr-end hw2 c-berry">обещаю и подписываюсь:</div>
   <div class="pr-sg">
-    <div class="sgc"><small class="lb">Я</small><div class="sgb"><svg viewBox="0 0 120 60"><path pathLength="1" d="M6 44C14 10 30 8 28 34C26 56 14 56 22 40C32 20 44 30 40 46C38 54 46 52 52 36C56 26 62 28 62 38C62 50 70 46 76 32C80 24 86 26 84 36C82 46 92 44 114 22" fill="none" stroke="#2b4ea2" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+    <div class="sgc"><small class="lb">Я</small><div class="sgb my-sign-box"><span class="sig-h">подпись со стр. 33</span></div></div>
     <div class="sgc"><small class="lb">Ты</small><div class="sgb sigw" data-noswipe><canvas class="sig" data-w="140" data-h="66" style="width:140px;height:66px"></canvas><span class="sig-h">подпиши пальцем</span></div></div>
   </div>
   <div class="pr-f"><span class="mn">подписано: ${new Date().toLocaleDateString('ru-RU')}</span><button class="sgx sk" data-act="sigx">стереть</button></div>`),
-init(root){const cv=$('.sig',root);
+init(root){renderMySign(root);const cv=$('.sig',root);
   root._sig=pad(cv,{color:'#2b4ea2',width:2.6,onDraw:()=>cv.parentNode.classList.add('drawn'),
     onEnd:()=>{try{localStorage.setItem(SIGKEY,cv.toDataURL('image/png'));}catch(e){}if(leaves[32])showHerSign(leaves[32].pg);}});
   const saved=herSign();
   if(saved){const im=new Image();im.onload=()=>{const sg=root._sig;sg.ctx.drawImage(im,0,0,sg.W,sg.H);sg.st.drawn=true;cv.parentNode.classList.add('drawn');};im.src=saved;}}});
 ACT.sigx=el=>{const pg=el.closest('.pg');if(pg._sig){pg._sig.clear();$('.sigw',pg).classList.remove('drawn');}
   try{localStorage.removeItem(SIGKEY);}catch(e){}if(leaves[32])showHerSign(leaves[32].pg);};
-
+function renderMySign(root){
+  const box=$('.my-sign-box',root);if(!box)return;
+  const d=mySign();
+  if(d){box.innerHTML='<img alt="Моя подпись" src="'+d+'" style="width:120px;height:60px;object-fit:contain">';}
+}
 /* ============ 38. Последний кадр ============ */
 const cornerS=(x,y,cp)=>D('corner',P(x,y,32,32,0,4,'clip-path:'+cp));
 def(38,{t:'Последний кадр',paper:'p-black',dark:true,
