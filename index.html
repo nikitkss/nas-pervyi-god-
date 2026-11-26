@@ -1591,9 +1591,10 @@ html:n=>D('ctsheet paper',P(22,14,318,548,.3,2),`
     <div class="sg sg-you"><small class="lb">Ты</small><i class="sgn" data-go="37">подпись на стр. 37</i></div>
   </div>
   <button class="wseal" data-act="seal" aria-label="Поставить печать"><span class="seal-o"><b>печать</b><i>тапни</i></span><svg class="wax" viewBox="0 0 100 100"><path d="${waxPath}" fill="#b3263f" stroke="#b3263f" stroke-width="4" stroke-linejoin="round"/><circle cx="50" cy="50" r="31" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2.5"/><use href="#i-heart" x="30" y="30" width="40" height="40" style="color:#ffc2cd"/></svg></button>`)
-,init(root){showHerSign(root);},show(root){showHerSign(root);}});
+,init(root){const cv=$('.sig-me',root);root._mySig=pad(cv,{color:'#2b4ea2',width:2.6,onDraw:()=>cv.parentNode.classList.add('drawn'),onEnd:()=>{try{localStorage.setItem(MY_SIGKEY,cv.toDataURL('image/png'));}catch(e){}}});const saved=mySign();if(saved){const im=new Image();im.onload=()=>{const s=root._mySig;s.ctx.drawImage(im,0,0,s.W,s.H);s.st.drawn=true;cv.parentNode.classList.add('drawn');};im.src=saved;}showHerSign(root);},show(root){showHerSign(root);}});
 const SIGKEY='nas-pervyi-god:her-sign';
-const herSign=()=>{try{return localStorage.getItem(SIGKEY)||'';}catch(e){return '';}};
+const MY_SIGKEY='nas-pervyi-god:my-sign';const mySign=()=>{try{return localStorage.getItem(MY_SIGKEY)||'';}catch(e){return '';}};
+  const herSign=()=>{try{return localStorage.getItem(SIGKEY)||'';}catch(e){return '';}};
 function showHerSign(root){
   const box=$('.sg-you',root);if(!box)return;const d=herSign();
   box.innerHTML='<small class="lb">Ты</small>'+(d?'<img class="sgi sgi-you" alt="подпись" src="'+d+'">':'<i class="sgn" data-go="37">подпись на стр. 37</i>');
