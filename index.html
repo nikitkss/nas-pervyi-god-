@@ -413,6 +413,7 @@ button:focus-visible{outline:2px solid var(--sun);outline-offset:2px}
 .tk .mn{font-weight:700;color:var(--berry)}
 .tk u{flex:1;border-bottom:2px dotted rgba(35,48,82,.55);text-decoration:none;font:700 24px/1.05 var(--hand);color:var(--ink);min-width:60px;transform:translateY(-3px)}
 .tk small{font:600 16px/1 var(--hand);color:#7a4a1e;white-space:nowrap}
+.tk.now u,.tk.now .mn{color:var(--berry)}
 .cpw{filter:drop-shadow(0 3px 4px rgba(60,40,10,.35));cursor:pointer}
 .cp{height:100%;padding:12px 18px 8px;text-align:center;-webkit-mask:radial-gradient(circle 9px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 9px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat;mask:radial-gradient(circle 9px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 9px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat;display:flex;flex-direction:column;justify-content:center;gap:2px}
 .cp small{font-size:15px;color:var(--berry);letter-spacing:.3em}
@@ -479,6 +480,13 @@ button:focus-visible{outline:2px solid var(--sun);outline-offset:2px}
 .wax{position:absolute;inset:0;width:100%;height:100%;opacity:0;rotate:-8deg;filter:drop-shadow(0 4px 5px rgba(80,10,20,.45))}
 .pg.sealed .wax{animation:waxin .5s .05s both}
 .pg.sealed .seal-o{display:none}
+
+@keyframes signdraw{from{stroke-dashoffset:1.03}to{stroke-dashoffset:0}}
+@keyframes sigfade{from{opacity:0}to{opacity:1}}
+.sgi path,.sgb svg path{stroke-dasharray:1 1.1;stroke-dashoffset:1.03}
+.pg.on .sgi path{animation:signdraw 2s ease-in-out .7s both}
+.pg.on .sgb svg path{animation:signdraw 1.8s ease-in-out 3.4s both}
+.sgi-you{object-fit:contain;animation:sigfade .7s both}
 
 /* 34 дерево */
 .bud{cursor:pointer}
@@ -607,7 +615,7 @@ button:focus-visible{outline:2px solid var(--sun);outline-offset:2px}
   <div id="fx"></div>
 </div>
 <script>
-const CFG={"draft": true, "me": "Никита", "you": "Вера", "start": "2025-12-17", "met": {"date": "2025-03-26", "place": "футбольное поле", "text": "Мы играли в волейбол на футбольном поле. Это почти всё, что я запомнил. Я ещё не знал, что всё начнётся именно с этого дня."}, "kiss": {"date": "2026-05-27", "place": "у подъезда", "text": "Я был в шоке, когда ты меня поцеловала. Совсем не ожидал, но мне было очень приятно."}, "ask": {"date": "2025-12-17", "place": "", "text": "Сначала я написал: «Ты же знаешь что я люблю тебя». А потом: «И хочу с тобой встречаться»."}, "love": {"date": "2025-06-06", "place": "в переписке", "words": "Мне кажется, что мне нужно признаться тебе в одном…", "text": "Я часто думаю о тебе, даже когда просто улыбаюсь без причины. Иногда такие мысли меня пугают, но я хочу быть честным. Ты мне нравишься, Вера."}, "songs": ["Династия · madk1d", "Бассок · Платина", "Моргенштерн · любое"], "last": "просто мы"};
+const CFG={"draft": true, "me": "Никита", "you": "Вера", "start": "2025-12-17", "met": {"date": "2025-03-26", "place": "футбольное поле", "text": "Мы играли в волейбол на футбольном поле. Это почти всё, что я запомнил. Я ещё не знал, что всё начнётся именно с этого дня."}, "kiss": {"date": "2026-05-27", "place": "у подъезда", "text": "Я был в шоке, когда ты меня поцеловала. Совсем не ожидал, но мне было очень приятно."}, "ask": {"date": "2025-12-17", "place": "", "text": "Сначала я написал: «Ты же знаешь что я люблю тебя». А потом: «И хочу с тобой встречаться»."}, "love": {"date": "2025-06-06", "place": "в переписке", "words": "Мне кажется, что мне нужно признаться тебе в одном…", "text": "Я часто думаю о тебе, даже когда просто улыбаюсь без причины. Иногда такие мысли меня пугают, но я хочу быть честным. Ты мне нравишься, Вера."}, "songs": ["Династия · madk1d", "Бассок · Платина", "Моргенштерн · ICE"], "last": "просто мы"};
 const PHOTOS=Object.assign({
   "p01a": {
     "src": "photos/p01a.jpg",
@@ -785,6 +793,12 @@ const PHOTOS=Object.assign({
   },
   "p22l": {
     "src": "photos/p22l.jpg",
+    "w": 900,
+    "h": 1200,
+    "cap": ""
+  },
+  "p34a": {
+    "src": "photos/p34a.jpg",
     "w": 900,
     "h": 1200,
     "cap": ""
@@ -1003,6 +1017,20 @@ function replay(root){root.classList.remove('on');void root.offsetWidth;root.cla
 
 /* ======================= шкатулка (музыка) ======================= */
 let AC=null,mb=null;
+/* ======================= плейлист (настоящие песни по порядку) ======================= */
+const TRACKS=['music/01-dynasty.mp3','music/02-bassok.mp3','music/03-ice.mp3'];
+let PL=null,plIdx=0;
+function plMark(){$$('.tk').forEach((t,i)=>t.classList.toggle('now',!!PL&&i===plIdx));}
+function plUI(on){const L=leaves[28];if(!L)return;$$('.cass,.mbbtn',L.pg).forEach(c=>c.classList.toggle('play',on));}
+function plStop(){if(PL){PL.onended=null;PL.onerror=null;PL.pause();PL=null;}plIdx=0;plMark();plUI(false);}
+function plPlay(){
+  plStop();
+  const a=new Audio();a.preload='auto';PL=a;
+  const go=i=>{plIdx=i;a.src=TRACKS[i];plMark();const pr=a.play();if(pr&&pr.catch)pr.catch(()=>{if(PL===a)plStop();});};
+  const next=()=>{if(PL!==a)return;if(plIdx>=TRACKS.length-1)plStop();else go(plIdx+1);};
+  a.onended=next;a.onerror=next;
+  go(0);plUI(true);
+}
 function mbStop(){
   if(mb){mb.on=false;clearTimeout(mb.tm);try{mb.master.gain.setTargetAtTime(0,AC.currentTime,.06);}catch(e){}mb=null;}
   $$('.cass,.mbbtn').forEach(c=>c.classList.remove('play'));
@@ -1040,8 +1068,8 @@ function pad(canvas,o={}){
   const pos=e=>{const r=canvas.getBoundingClientRect();return[(e.clientX-r.left)*W/r.width,(e.clientY-r.top)*H/r.height];};
   canvas.addEventListener('pointerdown',e=>{d=true;[lx,ly]=pos(e);canvas.setPointerCapture(e.pointerId);c.globalCompositeOperation=st.erase?'destination-out':'source-over';c.fillStyle=st.color;c.beginPath();c.arc(lx,ly,(st.erase?st.w*3:st.w)/2,0,7);c.fill();st.drawn=true;if(o.onDraw)o.onDraw();e.preventDefault();});
   canvas.addEventListener('pointermove',e=>{if(!d)return;const[x,y]=pos(e);c.globalCompositeOperation=st.erase?'destination-out':'source-over';c.strokeStyle=st.color;c.lineWidth=st.erase?st.w*3:st.w;c.beginPath();c.moveTo(lx,ly);c.lineTo(x,y);c.stroke();lx=x;ly=y;});
-  const up=()=>{d=false;};canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
-  return{st,clear(){c.globalCompositeOperation='source-over';c.clearRect(0,0,W,H);st.drawn=false;}};
+  const up=()=>{if(d&&o.onEnd)o.onEnd();d=false;};canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
+  return{st,ctx:c,W,H,clear(){c.globalCompositeOperation='source-over';c.clearRect(0,0,W,H);st.drawn=false;}};
 }
 
 const NAMES=(CFG.me&&CFG.you)?esc(CFG.me)+' + '+esc(CFG.you):'я + ты';
@@ -1499,16 +1527,16 @@ def(29,{t:'Кассета',paper:'p-orange',
 html:n=>[
   TX(24,10,320,'sc c-ink','Наш саундтрек',-2,4,'font-size:38px'),
   D('cass',P(30,62,300,176,-1.5,3),`<div class="cs-lab"><div class="lbl-t sc c-berry">Mix</div><div class="lbl-s hw c-pen">наш первый год</div><div class="lbl-a lb c-ink">сторона A</div></div><div class="cs-win"><i class="reel l"></i><i class="reel r"></i></div><div class="cs-foot"></div>`),
-  D('mbbtn',P(138,254,84,84,0,5),`<button data-act="play" aria-label="Мелодия"><svg class="pl" viewBox="0 0 100 100"><path d="M34 22L80 50 34 78z"/></svg><svg class="ps" viewBox="0 0 100 100"><path d="M28 22H44V78H28zM56 22H72V78H56z"/></svg></button>`),
-  TX(236,276,116,'hs c-ink','нажми:<br>наша мелодия<br>(пока без слов)',3,5,'font-size:16px;opacity:.75'),
+  D('mbbtn',P(138,254,84,84,0,5),`<button data-act="play" aria-label="Плейлист"><svg class="pl" viewBox="0 0 100 100"><path d="M34 22L80 50 34 78z"/></svg><svg class="ps" viewBox="0 0 100 100"><path d="M28 22H44V78H28zM56 22H72V78H56z"/></svg></button>`),
+  TX(236,276,116,'hs c-ink','нажми ▶:<br>песни пойдут<br>по порядку',3,5,'font-size:16px;opacity:.75'),
   D('tracks',P(28,364,304,null,0,3),SONGS.map((s,i)=>`<div class="tk"><span class="mn">0${i+1}</span><u>${CFG.songs&&CFG.songs[i]?esc(CFG.songs[i]):''}</u></div>`).join('')),
   TX(28,526,304,'hs c-ink','плейлист продолжается…',-1,4,'font-size:18px;opacity:.7'),
   IC('note',22,252,34,-12,'#d94f6a'),IC('note',306,244,26,12,'#233052')
 ].join(''),
-hide(){mbStop();}});
-ACT.play=el=>{const pg=el.closest('.pg');
-  if(mb){mbStop();return;}
-  if(mbPlay()){$('.cass',pg).classList.add('play');$('.mbbtn',pg).classList.add('play');}};
+hide(){plStop();}});
+ACT.play=()=>{
+  if(PL){if(PL.paused){const pr=PL.play();if(pr&&pr.catch)pr.catch(()=>{});plUI(true);}else{PL.pause();plUI(false);}return;}
+  plPlay();};
 
 /* ============ 30. Купоны ============ */
 const CPN=[['Вкусный сюрприз','любой выходной','#fbd0d8'],['Вечер по твоему выбору','кино, еда, музыка','#cfeadb'],['Объятие на 10 минут','без телефона','#fff0b0'],['Прощение мелкой вины','действует один раз','#cfe0f5'],['Массаж плеч','до полного расслабления','#fcd9bd'],['Любое желание','в разумных пределах','#e3d9f6']];
@@ -1559,11 +1587,17 @@ html:n=>D('ctsheet paper',P(22,14,318,548,.3,2),`
   <div class="ct-p c-ink">Я, ${blank(CFG.me,'моё имя')}, и Ты, ${blank(CFG.you,'твоё имя')}, далее «Мы», договорились:</div>
   <ol class="ct-l">${CLAUSES.map(c=>`<li><span>${c}</span></li>`).join('')}</ol>
   <div class="ct-sg">
-    <div class="sg"><small class="lb">Я</small><svg viewBox="0 0 120 60" class="sgi"><path d="M6 44C14 10 30 8 28 34C26 56 14 56 22 40C32 20 44 30 40 46C38 54 46 52 52 36C56 26 62 28 62 38C62 50 70 46 76 32C80 24 86 26 84 36C82 46 92 44 114 22" fill="none" stroke="#2b4ea2" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    <div class="sg"><small class="lb">Ты</small><i class="sgn" data-go="37">подпись на стр. 37</i></div>
+    <div class="sg"><small class="lb">Я</small><svg viewBox="0 0 120 60" class="sgi"><path pathLength="1" d="M6 44C14 10 30 8 28 34C26 56 14 56 22 40C32 20 44 30 40 46C38 54 46 52 52 36C56 26 62 28 62 38C62 50 70 46 76 32C80 24 86 26 84 36C82 46 92 44 114 22" fill="none" stroke="#2b4ea2" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="sg sg-you"><small class="lb">Ты</small><i class="sgn" data-go="37">подпись на стр. 37</i></div>
   </div>
   <button class="wseal" data-act="seal" aria-label="Поставить печать"><span class="seal-o"><b>печать</b><i>тапни</i></span><svg class="wax" viewBox="0 0 100 100"><path d="${waxPath}" fill="#b3263f" stroke="#b3263f" stroke-width="4" stroke-linejoin="round"/><circle cx="50" cy="50" r="31" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2.5"/><use href="#i-heart" x="30" y="30" width="40" height="40" style="color:#ffc2cd"/></svg></button>`)
-});
+,init(root){showHerSign(root);},show(root){showHerSign(root);}});
+const SIGKEY='nas-pervyi-god:her-sign';
+const herSign=()=>{try{return localStorage.getItem(SIGKEY)||'';}catch(e){return '';}};
+function showHerSign(root){
+  const box=$('.sg-you',root);if(!box)return;const d=herSign();
+  box.innerHTML='<small class="lb">Ты</small>'+(d?'<img class="sgi sgi-you" alt="подпись" src="'+d+'">':'<i class="sgn" data-go="37">подпись на стр. 37</i>');
+}
 ACT.seal=el=>{const pg=el.closest('.pg');if(pg.classList.contains('sealed'))return;pg.classList.add('sealed');confetti(40);heartsOn(el,8);};
 
 /* ============ 34. Дерево года ============ */
@@ -1587,8 +1621,8 @@ html:n=>[
   IC('sun',290,84,52,0,'#f6c54a'),IC('cloud',18,120,70,0,'#fff'),
   TREE,
   D('stake',P(72,522,10,40,0,4)),
-  PH(34,'a','фото под нашим деревом',{x:20,y:432,w:122,h:90,r:-4,f:'print',z:5}),
-  TP(64,424,44,-4,'yellow',6),
+  PH(34,'a','фото под нашим деревом',{x:20,y:390,w:112,h:140,r:-4,f:'print',z:5}),
+  TP(52,382,44,-4,'yellow',6),
   IC('daisy',262,500,34,8,'#fff'),IC('flower',298,514,30,-8,'#f6c0cb'),IC('leaf',240,522,24,30,'#6fae78')
 ].join('')});
 ACT.bud=el=>{if(el.classList.contains('on'))return;el.classList.add('on');
@@ -1646,12 +1680,17 @@ html:n=>D('paper pr',P(22,12,316,556,-.3,2),`
   <ol class="pr-l">${PROM.map((t,i)=>`<li class="wh" style="--dl:${(.2+i*.4).toFixed(2)}s"><span>${t}</span></li>`).join('')}</ol>
   <div class="pr-end hw2 c-berry">обещаю и подписываюсь:</div>
   <div class="pr-sg">
-    <div class="sgc"><small class="lb">Я</small><div class="sgb"><svg viewBox="0 0 120 60"><path d="M6 44C14 10 30 8 28 34C26 56 14 56 22 40C32 20 44 30 40 46C38 54 46 52 52 36C56 26 62 28 62 38C62 50 70 46 76 32C80 24 86 26 84 36C82 46 92 44 114 22" fill="none" stroke="#2b4ea2" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+    <div class="sgc"><small class="lb">Я</small><div class="sgb"><svg viewBox="0 0 120 60"><path pathLength="1" d="M6 44C14 10 30 8 28 34C26 56 14 56 22 40C32 20 44 30 40 46C38 54 46 52 52 36C56 26 62 28 62 38C62 50 70 46 76 32C80 24 86 26 84 36C82 46 92 44 114 22" fill="none" stroke="#2b4ea2" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
     <div class="sgc"><small class="lb">Ты</small><div class="sgb sigw" data-noswipe><canvas class="sig" data-w="140" data-h="66" style="width:140px;height:66px"></canvas><span class="sig-h">подпиши пальцем</span></div></div>
   </div>
   <div class="pr-f"><span class="mn">подписано: ${new Date().toLocaleDateString('ru-RU')}</span><button class="sgx sk" data-act="sigx">стереть</button></div>`),
-init(root){const cv=$('.sig',root);root._sig=pad(cv,{color:'#2b4ea2',width:2.6,onDraw:()=>cv.parentNode.classList.add('drawn')});}});
-ACT.sigx=el=>{const pg=el.closest('.pg');if(pg._sig){pg._sig.clear();$('.sigw',pg).classList.remove('drawn');}};
+init(root){const cv=$('.sig',root);
+  root._sig=pad(cv,{color:'#2b4ea2',width:2.6,onDraw:()=>cv.parentNode.classList.add('drawn'),
+    onEnd:()=>{try{localStorage.setItem(SIGKEY,cv.toDataURL('image/png'));}catch(e){}if(leaves[32])showHerSign(leaves[32].pg);}});
+  const saved=herSign();
+  if(saved){const im=new Image();im.onload=()=>{const sg=root._sig;sg.ctx.drawImage(im,0,0,sg.W,sg.H);sg.st.drawn=true;cv.parentNode.classList.add('drawn');};im.src=saved;}}});
+ACT.sigx=el=>{const pg=el.closest('.pg');if(pg._sig){pg._sig.clear();$('.sigw',pg).classList.remove('drawn');}
+  try{localStorage.removeItem(SIGKEY);}catch(e){}if(leaves[32])showHerSign(leaves[32].pg);};
 
 /* ============ 38. Последний кадр ============ */
 const cornerS=(x,y,cp)=>D('corner',P(x,y,32,32,0,4,'clip-path:'+cp));
