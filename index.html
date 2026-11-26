@@ -1018,7 +1018,7 @@ function replay(root){root.classList.remove('on');void root.offsetWidth;root.cla
 /* ======================= шкатулка (музыка) ======================= */
 let AC=null,mb=null;
 /* ======================= плейлист (настоящие песни по порядку) ======================= */
-const TRACKS=['music/01-dynasty.mp3','music/02-bassok.mp3','music/03-ice.mp3'];
+const TRACKS=['music/VILLIAN, madk1d — ДИНАСТИЯ (www.lightaudio.ru).m4a','music/Platina_Voskresenskii_-_Bassok_77691072.mp3','music/MORGENSHTERN_-_ICE_70436578.mp3'];
 let PL=null,plIdx=0;
 function plMark(){$$('.tk').forEach((t,i)=>t.classList.toggle('now',!!PL&&i===plIdx));}
 function plUI(on){const L=leaves[28];if(!L)return;$$('.cass,.mbbtn',L.pg).forEach(c=>c.classList.toggle('play',on));}
